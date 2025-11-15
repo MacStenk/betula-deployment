@@ -41,31 +41,24 @@ RUN apk add --no-cache \
     sqlite-libs \
     ca-certificates \
     tzdata \
-    wget
-
-# Non-root User für Security
-RUN addgroup -g 1000 betula && \
-    adduser -D -u 1000 -G betula betula
+    wget \
+    bash
 
 # Binary vom Builder kopieren
 COPY --from=builder /build/betula /usr/local/bin/betula
 
 # Data-Directory für SQLite-Datei
+# WICHTIG: Volume wird über Railway UI gemountet!
 RUN mkdir -p /data && \
-    chown -R betula:betula /data
-
-# WICHTIG: VOLUME keyword ist bei Railway nicht erlaubt!
-# Volume wird über Railway UI konfiguriert (/data)
-
-# Wechsel zu non-root User
-USER betula
+    chmod 777 /data
 
 # Betula Port
 EXPOSE 1738
 
-# Healthcheck (optional, aber empfohlen)
+# Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:1738/ || exit 1
 
-# Start Betula mit SQLite-Datei im Volume
-CMD ["betula", "/data/bookmarks.betula"]
+# Startup script um sicherzustellen dass /data beschreibbar ist
+# und die SQLite-Datei erstellt werden kann
+CMD ["sh", "-c", "mkdir -p /data && chmod 777 /data && exec betula /data/bookmarks.betula"]
