@@ -1,372 +1,227 @@
-# 🔖 Betula auf Railway
+# 🔖 Betula auf Railway - Production Deployment
 
-**Production-ready Deployment für Betula** - den federated bookmark manager.
+**Federated Bookmark Manager auf Railway deployen - einfach, schnell, production-ready.**
 
+[![Live Demo](https://img.shields.io/badge/Live-bookmarks.stevennoack.de-blue)](https://bookmarks.stevennoack.de)
+[![Fediverse](https://img.shields.io/badge/Fediverse-@steven-purple)](https://bookmarks.stevennoack.de)
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/betula)
 
-## 📋 Was ist Betula?
+---
 
-Betula ist ein **single-user federated bookmark manager** mit:
+## 🎯 Was ist das hier?
 
-- ✅ ActivityPub-Unterstützung (Fediverse-kompatibel)
-- ✅ SQLite-basiert (keine PostgreSQL-Komplexität)
-- ✅ Go-basiert (ein Binary, simple Deployment)
-- ✅ RSS/Atom Feeds
-- ✅ Tag-System
-- ✅ Webmention-Support
+Ein **production-ready Deployment-Setup** für [Betula](https://betula.mycorrhiza.wiki/) - den federated bookmark manager - optimiert für Railway.
 
-**Links:**
-- [Offizielle Docs](https://betula.mycorrhiza.wiki/)
-- [Source Code](https://codeberg.org/bouncepaw/betula)
+**Live Demo:** [bookmarks.stevennoack.de](https://bookmarks.stevennoack.de)  
+**Fediverse:** `@steven@bookmarks.stevennoack.de`
 
 ---
 
-## 🚀 Quick Start (5 Minuten)
+## ✨ Features
 
-### 1️⃣ GitHub Repository erstellen
+- ✅ **Production-ready Dockerfile** - Multi-stage Build mit CGO-Support
+- ✅ **Railway-optimiert** - Volume-Support für SQLite-Persistenz
+- ✅ **Custom Domain** - HTTPS automatisch via Let's Encrypt
+- ✅ **ActivityPub/Fediverse** - Federation out-of-the-box
+- ✅ **Zero-Config** - Git push = Deploy
+- ✅ **Sicher** - Non-root User, optimierte Permissions
+- ✅ **Klein** - Docker Image ~20-30 MB
+
+---
+
+## 🚀 Quick Start (15 Minuten)
+
+### 1. Repository klonen
 
 ```bash
-# Klone dieses Template
-git clone https://github.com/DEIN-USERNAME/betula-railway.git
-cd betula-railway
-
-# Oder: Fork dieses Repo auf GitHub
+git clone https://github.com/MacStenk/betula-deployment.git
+cd betula-deployment
 ```
 
-### 2️⃣ Railway Projekt erstellen
+### 2. Auf GitHub pushen
+
+```bash
+# Erstelle neues GitHub Repo "betula-deployment"
+# Dann:
+git remote set-url origin https://github.com/DEIN-USERNAME/betula-deployment.git
+git push -u origin main
+```
+
+### 3. Railway deployen
 
 1. Gehe zu [railway.app](https://railway.app)
-2. Klicke "New Project"
-3. Wähle "Deploy from GitHub repo"
-4. Wähle dein `betula-railway` Repository
+2. "New Project" → "Deploy from GitHub repo"
+3. Wähle dein Repository
+4. **Wichtig:** Volume hinzufügen:
+   - Variables Tab → "Add Volume"
+   - Mount Path: `/data`
+   - Size: `1 GB`
 
-### 3️⃣ Volume konfigurieren
+### 4. Domain konfigurieren
 
-**KRITISCH: Ohne Volume = Datenverlost bei jedem Deploy!**
+**Railway:**
+- Settings → Domains → "Custom Domain"
+- Gib deine Domain ein (z.B. `bookmarks.deinedomain.de`)
 
-1. Im Railway Dashboard → dein Service → **Variables** Tab
-2. Klicke **"New Variable"** → **"Add Volume"**
-3. Mount Path: `/data`
-4. Size: `1GB` (oder mehr, je nach Bedarf)
-
-### 4️⃣ Domain konfigurieren (optional)
-
-1. Railway Dashboard → **Settings** Tab
-2. **Domains** → **Generate Domain** (oder Custom Domain)
-3. Notiere dir die URL (z.B. `betula-production.up.railway.app`)
-
-### 5️⃣ Deploy starten
-
-Railway deployt automatisch! Warte ca. 2-3 Minuten.
-
-**Deployment beobachten:**
-- Dashboard → **Deployments** Tab
-- Logs ansehen für Errors
-
-### 6️⃣ Ersten Admin-User erstellen
-
-**Nach erfolgreichem Deploy:**
-
-```bash
-# Railway CLI installieren (falls noch nicht)
-npm i -g @railway/cli
-
-# In Railway einloggen
-railway login
-
-# In dein Projekt-Verzeichnis
-cd betula-railway
-railway link
-
-# Shell im Container öffnen
-railway run
-
-# Im Container: Admin-User erstellen
-betula /data/bookmarks.betula -admin-username deinname -admin-password deinpasswort
+**DNS (bei deinem Provider):**
+```
+Type:  CNAME
+Name:  bookmarks
+Value: [deine-railway-domain].up.railway.app
 ```
 
-**Oder via Railway Dashboard:**
-1. Service → **Settings** → **Raw Editor**
-2. Einmalig Start Command ändern zu:
-   ```
-   betula /data/bookmarks.betula -admin-username admin -admin-password changeme
-   ```
-3. Nach erstem Start wieder zurück zu: `betula /data/bookmarks.betula`
+### 5. Admin-Account erstellen
 
-**Dann:** Öffne deine Betula-URL und logge dich ein!
+Nach dem Deploy:
+1. Öffne deine Betula-URL
+2. Registriere deinen Admin-Account
+3. Fertig! 🎉
 
 ---
 
-## 🔧 Technische Details
+## 📋 Technische Details
 
 ### Dockerfile
 
-- **Multi-stage build:** Go builder + Alpine runtime
-- **CGO_ENABLED=1:** Essentiell für SQLite-Support
-- **Non-root User:** Security Best Practice
-- **Healthcheck:** Automatic health monitoring
-- **Optimiert:** Kleine Image-Größe (~20-30 MB)
+**Multi-stage Build:**
+- **Stage 1:** Go 1.23 Builder mit CGO-Support für SQLite
+- **Stage 2:** Alpine 3.19 Runtime (minimal)
 
-### Port
+**Key Features:**
+- CGO_ENABLED=1 (kritisch für SQLite!)
+- Optimiertes Binary (~20 MB)
+- Healthcheck integriert
+- Volle Permissions für `/data` Volume
 
-- **Container Port:** `1738`
-- **Railway:** Mapped automatisch zu öffentlicher URL
+### Railway-Konfiguration
 
-### Volume
+**Port:** 1738 (automatisch gemappt)  
+**Volume:** `/data` (persistent SQLite)  
+**Restart Policy:** Always  
+**Region:** Wählbar (empfohlen: EU-West für Deutschland)
 
-- **Mount Path:** `/data`
-- **SQLite File:** `/data/bookmarks.betula`
-- **Empfohlene Größe:** 1-5 GB (je nach Bookmark-Anzahl)
+### Technologie-Stack
 
-### Environment Variables
-
-Betula nutzt **keine** Environment Variables für Core-Funktionalität.
-Alle Konfiguration erfolgt via Command-Line-Flags beim Start.
-
-**Optional (für erweiterte Setups):**
-
-```bash
-# Timezone (optional)
-TZ=Europe/Berlin
-
-# Custom Port (falls nötig, Standard: 1738)
-# Betula hat kein PORT env var, Port wird via Railway gemappt
-```
+- **Language:** Go 1.23
+- **Database:** SQLite (single file)
+- **Platform:** Railway
+- **Web Server:** Betula (built-in)
+- **SSL:** Let's Encrypt (automatisch)
+- **Federation:** ActivityPub
 
 ---
 
-## 📝 Häufige Aufgaben
+## 🔧 Anpassungen
 
-### Updates deployen
+### Custom Domain ändern
 
-```bash
-# Railway deployt automatisch bei Git Push
-git add .
-git commit -m "Update configuration"
-git push origin main
+**In Betula Settings:**
+```
+Site address: https://deine-custom-domain.de
 ```
 
-### Backups erstellen
+**In Railway:**
+- Settings → Domains → Custom Domain hinzufügen
 
-**Option 1: Railway Volume Backup (empfohlen)**
+### Volume-Größe erhöhen
 
-Railway bietet automatische Volume-Backups (je nach Plan).
+Railway Dashboard → Variables → Volume → Edit Size
 
-**Option 2: Manuelle SQLite-Datei kopieren**
+**Empfohlene Größen:**
+- Small (bis 10k Bookmarks): 1 GB
+- Medium (bis 50k): 5 GB
+- Large (100k+): 10 GB
+
+### Backup erstellen
 
 ```bash
 # Via Railway CLI
-railway run
+railway run sh
 
-# Im Container
-cat /data/bookmarks.betula > /tmp/backup.betula
-# Dann von /tmp runterladen via Railway Dashboard
-```
-
-**Option 3: SQLite Dump**
-
-```bash
-railway run
-
-# Im Container
+# Im Container:
 sqlite3 /data/bookmarks.betula .dump > /tmp/backup.sql
 ```
 
-### Logs ansehen
+---
 
-```bash
-# Via Railway CLI
-railway logs
+## 🌐 ActivityPub / Fediverse
 
-# Oder im Dashboard: Deployments → Logs
+### Setup
+
+1. **Custom Domain** ist Pflicht für Federation
+2. **In Betula Settings:**
+   - Enable federation (Fediverse) ✅
+   - Site address: `https://deine-domain.de`
+
+### Dein Fediverse-Handle
+
+```
+@username@deine-domain.de
 ```
 
-### Datenbank reparieren (falls korrupt)
-
-```bash
-railway run
-
-# Im Container
-sqlite3 /data/bookmarks.betula "PRAGMA integrity_check;"
-sqlite3 /data/bookmarks.betula "VACUUM;"
-```
+**Von Mastodon/Fediverse folgen:**
+- Suche nach deinem Handle
+- Follow → Öffentliche Bookmarks erscheinen in Timeline!
 
 ---
 
-## 🌐 ActivityPub & Fediverse
+## 📊 Success Story
 
-### Domain konfigurieren
+**Von Zero zu Production in 90 Minuten:**
 
-Für ActivityPub brauchst du eine **feste Domain**:
+- ✅ Docker Build erfolgreich
+- ✅ Railway Deployment live
+- ✅ Custom Domain mit HTTPS
+- ✅ Persistent SQLite Volume
+- ✅ ActivityPub Federation aktiv
+- ✅ Erster Bookmark gespeichert
 
-1. Railway → **Settings** → **Domains**
-2. **Custom Domain** hinzufügen (z.B. `bookmarks.deinedomain.de`)
-3. DNS bei deinem Provider: CNAME → Railway-Domain
-
-### Fediverse-Profil
-
-Dein Betula-Instance ist erreichbar als:
-
-```
-@deinusername@bookmarks.deinedomain.de
-```
-
-Andere können dir folgen und sehen deine öffentlichen Bookmarks!
-
-### WebFinger
-
-Betula bietet automatisch WebFinger-Support:
-
-```
-https://bookmarks.deinedomain.de/.well-known/webfinger?resource=acct:deinusername@bookmarks.deinedomain.de
-```
-
----
-
-## 🔒 Sicherheit
-
-### HTTPS
-
-Railway bietet **automatisches HTTPS** via Let's Encrypt. Keine Konfiguration nötig!
-
-### Passwort ändern
-
-**Nach dem ersten Setup unbedingt Passwort ändern!**
-
-```bash
-railway run
-
-# Im Container
-betula /data/bookmarks.betula -reset-password deinusername
-# Folge den Prompts
-```
-
-### Privatsphäre-Einstellungen
-
-In Betula (nach Login):
-
-1. **Settings** → **Privacy**
-2. Wähle: Public / Unlisted / Private
+**VIBE Coding in Action:** Orchestriert mit Claude statt selbst gecoded.
 
 ---
 
 ## 🐛 Troubleshooting
 
-### "Database locked" Error
+### Build schlägt fehl
 
-**Ursache:** Zwei Betula-Instanzen greifen gleichzeitig auf SQLite zu.
+**Problem:** `no Go files in /build`
 
-**Lösung:**
-```bash
-# Stelle sicher, dass nur eine Instance läuft
-railway ps
-railway scale 1
+**Lösung:** Stelle sicher dass im Dockerfile steht:
+```dockerfile
+RUN go build -o betula ./cmd/betula
 ```
 
-### Volume nicht gemountet
+### Service crasht
 
-**Symptom:** Daten gehen bei Redeploy verloren.
+**Problem:** `unable to open database file`
 
-**Lösung:**
-1. Railway Dashboard → Service → **Variables**
-2. Überprüfe Volume Mount: `/data`
-3. Redeploy
+**Lösung:** Volume-Mount prüfen:
+- Railway → Variables → Volume muss auf `/data` gemountet sein
 
-### Build fehlschlägt
+### Domain funktioniert nicht
 
-**Ursache:** Meist CGO-related.
+**Problem:** DNS nicht konfiguriert
 
-**Lösung:**
-1. Überprüfe Dockerfile: `ENV CGO_ENABLED=1` vorhanden?
-2. Check Build-Logs für Details
-3. Issue auf GitHub öffnen mit Logs
-
-### Port-Konflikte
-
-**Symptom:** Service startet nicht, Port-Error.
-
-**Lösung:**
-Railway mappt Port `1738` automatisch. Keine Änderung nötig!
+**Lösung:** 
+1. DNS CNAME prüfen (dig bookmarks.deinedomain.de)
+2. Warte 5-60 Min für Propagation
+3. Railway Domain verifiziert? (Settings → Domains)
 
 ---
 
-## 📊 Performance & Skalierung
+## 📚 Dokumentation
 
-### Ressourcen-Empfehlungen
+### Betula
 
-**Small Instance (bis 10.000 Bookmarks):**
-- RAM: 256 MB
-- Volume: 1 GB
+- **Offizielle Docs:** https://betula.mycorrhiza.wiki/
+- **Source Code:** https://codeberg.org/bouncepaw/betula
+- **ActivityPub Guide:** https://betula.mycorrhiza.wiki/activitypub
 
-**Medium Instance (bis 50.000 Bookmarks):**
-- RAM: 512 MB
-- Volume: 5 GB
+### Railway
 
-**Large Instance (bis 100.000+ Bookmarks):**
-- RAM: 1 GB
-- Volume: 10 GB
-
-### SQLite Performance
-
-Betula nutzt SQLite mit:
-- WAL-Mode (Write-Ahead Logging)
-- Optimierte Indices
-- Effiziente Queries
-
-**Bei Performance-Problemen:**
-
-```bash
-railway run
-
-# Im Container
-sqlite3 /data/bookmarks.betula "PRAGMA optimize;"
-sqlite3 /data/bookmarks.betula "VACUUM;"
-```
-
----
-
-## 🎯 Template-Nutzung
-
-Dieses Repo ist als **Template** konzipiert!
-
-### Für deine eigene Instance
-
-1. Fork dieses Repo
-2. Passe `README.md` an (deine Domain, etc.)
-3. Optional: Passe Dockerfile an (z.B. andere Betula-Version)
-4. Deploy auf Railway
-
-### Für andere teilen
-
-1. Erstelle Railway Template (deploy + "Share Template")
-2. Andere können mit einem Klick deployen!
-
-**Railway Template Button:**
-
-```markdown
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DEIN-TEMPLATE-SLUG)
-```
-
----
-
-## 📚 Weiterführende Ressourcen
-
-### Betula Dokumentation
-
-- [Offizielles Wiki](https://betula.mycorrhiza.wiki/)
-- [Betula-Codeberg](https://codeberg.org/bouncepaw/betula)
-- [ActivityPub Guide](https://betula.mycorrhiza.wiki/activitypub)
-
-### Railway Docs
-
-- [Volumes Guide](https://docs.railway.app/reference/volumes)
-- [Dockerfiles](https://docs.railway.app/deploy/dockerfiles)
-- [Custom Domains](https://docs.railway.app/deploy/exposing-your-app)
-
-### Fediverse
-
-- [ActivityPub Spec](https://www.w3.org/TR/activitypub/)
-- [WebFinger Spec](https://webfinger.net/)
+- **Volumes Guide:** https://docs.railway.app/reference/volumes
+- **Custom Domains:** https://docs.railway.app/deploy/exposing-your-app
+- **Dockerfiles:** https://docs.railway.app/deploy/dockerfiles
 
 ---
 
@@ -375,35 +230,43 @@ Dieses Repo ist als **Template** konzipiert!
 Verbesserungen? Bugs gefunden?
 
 1. Fork this Repo
-2. Create Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit Changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to Branch (`git push origin feature/AmazingFeature`)
+2. Create Feature Branch
+3. Commit Changes
+4. Push to Branch
 5. Open Pull Request
 
 ---
 
 ## 📄 Lizenz
 
-Dieses Deployment-Setup: **MIT License**
+**Dieses Deployment-Setup:** MIT License
 
-Betula selbst: **AGPL-3.0** (siehe [Betula Lizenz](https://codeberg.org/bouncepaw/betula/src/branch/master/LICENSE))
+**Betula selbst:** AGPL-3.0 (siehe [Betula License](https://codeberg.org/bouncepaw/betula/src/branch/master/LICENSE))
 
 ---
 
 ## 💝 Credits
 
-- **Betula:** [@bouncepaw](https://codeberg.org/bouncepaw)
-- **Railway:** [railway.app](https://railway.app)
-- **Dieses Template:** [Dein Name / GitHub Handle]
+- **Betula:** [@bouncepaw](https://codeberg.org/bouncepaw) - Awesome bookmark manager!
+- **Railway:** [railway.app](https://railway.app) - Perfect deployment platform
+- **Deployment Setup:** [Steven Noack](https://stevennoack.de) - VIBE Coding with Claude
 
 ---
 
 ## 🔗 Links
 
-- **Live Demo:** [deine-betula-instance.railway.app]
-- **GitHub Repo:** [github.com/DEIN-USERNAME/betula-railway]
-- **Railway Template:** [railway.app/template/betula]
+- **Live Demo:** [bookmarks.stevennoack.de](https://bookmarks.stevennoack.de)
+- **Fediverse:** [@steven@bookmarks.stevennoack.de](https://bookmarks.stevennoack.de)
+- **GitHub Repo:** [MacStenk/betula-deployment](https://github.com/MacStenk/betula-deployment)
+- **Railway Template:** Coming soon!
 
 ---
+
+## 🎉 Deployment erfolgreich!
+
+**Deployed on:** 2025-11-15  
+**Platform:** Railway  
+**Status:** ✅ Production  
+**Domain:** bookmarks.stevennoack.de
 
 **Happy Bookmarking! 🔖✨**
