@@ -4,7 +4,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Live-bookmarks.stevennoack.de-blue)](https://bookmarks.stevennoack.de)
 [![Fediverse](https://img.shields.io/badge/Fediverse-@steven-purple)](https://bookmarks.stevennoack.de)
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/betula)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/-4P_cD?referralCode=O9X8Xs)
 
 ---
 
@@ -23,22 +23,35 @@ Ein **production-ready Deployment-Setup** für [Betula](https://betula.mycorrhiz
 - ✅ **Railway-optimiert** - Volume-Support für SQLite-Persistenz
 - ✅ **Custom Domain** - HTTPS automatisch via Let's Encrypt
 - ✅ **ActivityPub/Fediverse** - Federation out-of-the-box
+- ✅ **1-Click Deploy** - Railway Template für sofortigen Start
 - ✅ **Zero-Config** - Git push = Deploy
 - ✅ **Sicher** - Non-root User, optimierte Permissions
 - ✅ **Klein** - Docker Image ~20-30 MB
 
 ---
 
-## 🚀 Quick Start (15 Minuten)
+## 🚀 Quick Start
 
-### 1. Repository klonen
+### Option 1: 1-Click Deploy (2 Minuten)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/-4P_cD?referralCode=O9X8Xs)
+
+1. Klicke auf "Deploy on Railway"
+2. Login bei Railway
+3. Deploy starten
+4. **Volume hinzufügen:** Variables → Add Volume → Mount: `/data` → Size: `1 GB`
+5. Fertig! 🎉
+
+### Option 2: Von GitHub (15 Minuten)
+
+#### 1. Repository klonen
 
 ```bash
 git clone https://github.com/MacStenk/betula-deployment.git
 cd betula-deployment
 ```
 
-### 2. Auf GitHub pushen
+#### 2. Auf GitHub pushen
 
 ```bash
 # Erstelle neues GitHub Repo "betula-deployment"
@@ -47,7 +60,7 @@ git remote set-url origin https://github.com/DEIN-USERNAME/betula-deployment.git
 git push -u origin main
 ```
 
-### 3. Railway deployen
+#### 3. Railway deployen
 
 1. Gehe zu [railway.app](https://railway.app)
 2. "New Project" → "Deploy from GitHub repo"
@@ -57,7 +70,7 @@ git push -u origin main
    - Mount Path: `/data`
    - Size: `1 GB`
 
-### 4. Domain konfigurieren
+#### 4. Domain konfigurieren (optional)
 
 **Railway:**
 - Settings → Domains → "Custom Domain"
@@ -70,7 +83,7 @@ Name:  bookmarks
 Value: [deine-railway-domain].up.railway.app
 ```
 
-### 5. Admin-Account erstellen
+#### 5. Admin-Account erstellen
 
 Nach dem Deploy:
 1. Öffne deine Betula-URL
@@ -174,6 +187,7 @@ sqlite3 /data/bookmarks.betula .dump > /tmp/backup.sql
 - ✅ Custom Domain mit HTTPS
 - ✅ Persistent SQLite Volume
 - ✅ ActivityPub Federation aktiv
+- ✅ Railway Template veröffentlicht
 - ✅ Erster Bookmark gespeichert
 
 **VIBE Coding in Action:** Orchestriert mit Claude statt selbst gecoded.
@@ -222,6 +236,7 @@ RUN go build -o betula ./cmd/betula
 - **Volumes Guide:** https://docs.railway.app/reference/volumes
 - **Custom Domains:** https://docs.railway.app/deploy/exposing-your-app
 - **Dockerfiles:** https://docs.railway.app/deploy/dockerfiles
+- **Templates:** https://docs.railway.app/deploy/templates
 
 ---
 
@@ -258,7 +273,7 @@ Verbesserungen? Bugs gefunden?
 - **Live Demo:** [bookmarks.stevennoack.de](https://bookmarks.stevennoack.de)
 - **Fediverse:** [@steven@bookmarks.stevennoack.de](https://bookmarks.stevennoack.de)
 - **GitHub Repo:** [MacStenk/betula-deployment](https://github.com/MacStenk/betula-deployment)
-- **Railway Template:** Coming soon!
+- **Railway Template:** [1-Click Deploy](https://railway.com/deploy/-4P_cD?referralCode=O9X8Xs)
 
 ---
 
@@ -267,6 +282,7 @@ Verbesserungen? Bugs gefunden?
 **Deployed on:** 2025-11-15  
 **Platform:** Railway  
 **Status:** ✅ Production  
-**Domain:** bookmarks.stevennoack.de
+**Domain:** bookmarks.stevennoack.de  
+**Template:** ✅ Published
 
 **Happy Bookmarking! 🔖✨**
