@@ -1,0 +1,68 @@
+# Betula Railway Deployment - .gitignore
+
+# Local SQLite database (nur für lokale Tests)
+*.betula
+*.db
+*.sqlite
+*.sqlite3
+
+# Data directory
+/data/
+
+# Logs
+*.log
+logs/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Railway local
+.railway/
+
+# Environment files (falls du custom env nutzt)
+.env
+.env.local
+.env.*.local
+
+# Backup files
+backup/
+*.backup
+*.bak
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node (falls du Railway CLI via npm installiert hast)
+node_modules/
+package-lock.json
+yarn.lock
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*

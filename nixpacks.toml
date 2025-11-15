@@ -1,0 +1,15 @@
+# nixpacks.toml
+# Railway Deployment-Konfiguration für Betula
+
+[phases.setup]
+nixPkgs = ["..."]
+
+[phases.build]
+# Wir nutzen Docker, daher kein nixpacks build nötig
+
+[start]
+cmd = "betula /data/bookmarks.betula"
+
+[variables]
+# Port muss mit Railway's PORT variable übereinstimmen
+PORT = "1738"
