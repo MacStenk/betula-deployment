@@ -53,8 +53,8 @@ COPY --from=builder /build/betula /usr/local/bin/betula
 RUN mkdir -p /data && \
     chown -R betula:betula /data
 
-# Volume für persistente Daten (Railway Volume Mount)
-VOLUME /data
+# WICHTIG: VOLUME keyword ist bei Railway nicht erlaubt!
+# Volume wird über Railway UI konfiguriert (/data)
 
 # Wechsel zu non-root User
 USER betula
