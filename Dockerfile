@@ -17,7 +17,7 @@ RUN apk add --no-cache \
 WORKDIR /build
 
 # Betula aus dem offiziellen Codeberg-Repository klonen
-RUN git clone https://codeberg.org/bouncepaw/betula.git .
+RUN git clone --depth 1 https://codeberg.org/bouncepaw/betula.git .
 
 # CGO aktivieren (essentiell für SQLite!)
 ENV CGO_ENABLED=1
@@ -25,11 +25,11 @@ ENV CGO_ENABLED=1
 # Go Dependencies laden
 RUN go mod download
 
-# Binary bauen (statisch gelinkt für Alpine)
+# Binary bauen - WICHTIG: Betula main ist in ./cmd/betula!
 RUN go build -o betula \
     -ldflags="-w -s" \
     -trimpath \
-    .
+    ./cmd/betula
 
 # ============================================
 # Stage 2: Runtime
@@ -40,7 +40,8 @@ FROM alpine:3.19
 RUN apk add --no-cache \
     sqlite-libs \
     ca-certificates \
-    tzdata
+    tzdata \
+    wget
 
 # Non-root User für Security
 RUN addgroup -g 1000 betula && \
